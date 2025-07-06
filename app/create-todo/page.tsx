@@ -98,7 +98,7 @@ export default function CreateTodo() {
                     onChange={(e)=> setTitle(e.target.value)}/>
                 </div>
 
-                <div className="tdate-container">
+                <div className="date-container">
                 <label  className="placeholder" htmlFor="">Date</label>
                     <input  
                     className="input" 

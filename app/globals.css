@@ -157,6 +157,17 @@ label {
     display: flex;
     justify-content: right;
     align-items: center; 
+    flex-direction: column;
+    align-items: flex-end;
+    
+}
+.redirect-link{
+    margin-top: 30px;
+    text-decoration: none;
+    color : #98400d;
+}
+.redirect-link:hover{
+    color: #D56729;
 }
 
 .btn-success {

@@ -1,6 +1,8 @@
 'use client'
 import { useState , useEffect, use} from "react"
-
+import { formatDate } from "../utils/formateDate"
+import { TrashIcon , PencilSquareIcon } from "@heroicons/react/24/outline"
+import { useRouter } from "next/navigation"
 
 type Todo = {
   id: string;
@@ -13,26 +15,50 @@ export default function Todos() {
   const [todos, setTodos] = useState<Todo[]>([])
   const [isLoading, setIsLoading] = useState<boolean>(true)
 
+  const router = useRouter()
+
   // au montage du composant, on recupère les todos depuis l'API
   useEffect(() => {
-    const getTodos = async ()=>{
-      const response = await fetch('/api/get-todos',  {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json'
+    
+ 
+    const getTodos = async () => {
+      try {
+        const response = await fetch('/api/get-todos', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+    
+        if (!response.ok) {
+          console.error("Erreur serveur :", response.status)
+          throw new Error("Erreur lors du chargement des tâches.")
         }
-      })
-
-      const data = await response.json()
-      console.log("ma todolist",data)
-
-      setTodos(data)
-      setIsLoading(false)
-      
+    
+        const data = await response.json()
+        // console.log("ma todolist", data)
+        setTodos(data)
+      } catch (err) {
+        console.error("Erreur dans getTodos :", err)
+      } finally {
+        setIsLoading(false)
+      }
     }
     // appel de la fonction pour récupérer les todos 
     getTodos()
   }, [])
+
+
+  const handleEdit =  async (todo: Todo) => {
+    // if (!todo || !todo.id) {
+    //   console.error("Todo ou ID manquant pour l'édition");
+    //   return;
+    // }
+    // redirection vers la page d'édition de la todo
+    router.push(`/todos/edit?id=${encodeURIComponent(todo.id)}`)
+    console.log("nodda")
+  }
+
     
 
   return (
@@ -57,22 +83,21 @@ export default function Todos() {
             {todos.map((todo  : Todo) => (
               <li key={todo.id} className="li-list">
                 <div className="todo">
-                  <p>
+
+                  <p className="date">
                     {
-                      // on formate la date pour l'afficher
-                      new Date(todo.date).toLocaleDateString('fr-FR', {
-                        year: 'numeric',
-                        month: '2-digit',
-                        day: '2-digit'
-                      })
+                      formatDate(todo.date)
                     }
                   </p>
-                </div>
-                <h2>{todo.title}</h2>
+                  <h2>{todo.title}</h2>
 
-                <div className="todo-btn">
-                  <button onClick={()=>{}} className="btn btn-delete">Supprimer</button>
-                  <button onClick={()=>{}} className="btn btn-update">Modifier</button>    
+                  <div>
+                    <button onClick={()=>handleEdit(todo)} className="btn btn-update">
+                      <PencilSquareIcon style={{width : "20px"}}/> </button>
+                    <button onClick={()=>{}} className="btn btn-delete">
+                      <TrashIcon style={{width : "20px"}}/> </button>    
+                  </div>
+
                 </div>
 
               </li>

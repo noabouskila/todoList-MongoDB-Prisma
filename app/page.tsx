@@ -7,12 +7,12 @@ export default function Home() {
     <div className="splash-container">
       <div className="left-box">
         <section>
-          <h1>Bienvenue sur l'application </h1>
+          <h1>Bienvenue sur l&apos;application </h1>
           <p>Une CRUD application codée dans le cadre de la formation Next.js de DonkeyGeek</p>
           <h2>Objectifs :</h2>
           <ul>
             <li>Coder un application fonctionnelle tout en revisant les concept de Next js via App Router </li>
-            <li>Découvrir les BDD NoSql (MongoDb ) avant d'aborder le sql avec PostgreSql</li>
+            <li>Découvrir les BDD NoSql (MongoDb ) avant d&apos;aborder le sql avec PostgreSql</li>
             <li>Mettre en pratique nos connaissances des Routes Handlers avec GET PATCH ET DELETE ( valeurs dynamiques) </li>
           </ul>
         </section>

@@ -188,6 +188,11 @@ label {
     background-color: #98400d;
 }
 
+.btn-success:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
 section {
     width: 100%;
     padding: 0px 20px;

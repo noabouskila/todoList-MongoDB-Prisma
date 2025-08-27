@@ -4,6 +4,7 @@ import {  useEffect , useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { ToastContainer, toast } from 'react-toastify';
 
 
 
@@ -21,6 +22,8 @@ const EditPage = () => {
     const searchParams = useSearchParams();
     const todoId = searchParams.get('id');
     const router = useRouter();
+    // état pour gérer l'activation / desactivation du  bouton de soumission
+    const [isDisabled , setIsDisabled] = useState(false);
 
     const [ todo, setTodo ] = useState <Todo | undefined>();
     const  [title , setTitle] = useState('');
@@ -34,7 +37,7 @@ const EditPage = () => {
 
             const getTodo = async () => {
                 try {
-                    const response = await fetch(`/api/get-todos/${todoId}`);
+                    const response = await fetch(`/api/todos/${todoId}`);
                     
                     if (response.ok) {
                         // si la réponse est ok, on récupère les données
@@ -65,13 +68,61 @@ const EditPage = () => {
     }, [todoId , router]);
 
 
-    const handleEditTodo = async (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault()
+    const handleEditTodo = async (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault()
+
+        // desactiver le boutton de soumission 
+        setIsDisabled(true);
+
+        if( !title || !date ) {
+            alert('Veuillez remplir tous les champs');
+            setIsDisabled(false);
+            return;
+        }
+
+        // methode patch pour mettre à jour la todo
+        const response = await fetch(`/api/todos/${todoId}`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                title,
+                date,
+            }),
+        })
+        const data = await response.json();
+        // console.log('ma data modifiée', data)
+
+        if(response.ok){
+            toast.success("Tâche modifiée avec succes" , {
+                onClose : ()=> {
+                    router.push('/todos')
+                }
+            })
+        }
+        
+
+
+
+
     }
 
 
   return  todo ? (
     <> 
+      <ToastContainer
+        position="top-center"
+        autoClose={500}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick={false}
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        />
+
         <form className="form" onSubmit={handleEditTodo}>
             <div className="title">
                 <h1>Modifier la tâche</h1>
@@ -101,7 +152,7 @@ const EditPage = () => {
 
             <div className="button-container">
                   
-                <button type="submit" className="btn-success">Modifier</button>
+                <button disabled={isDisabled} type="submit" className="btn-success">Modifier</button>
                 <Link href="/todos" className="redirect-link">Vers mes Tâches</Link>
                 
             </div>

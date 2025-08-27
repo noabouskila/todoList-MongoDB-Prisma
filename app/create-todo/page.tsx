@@ -1,78 +1,52 @@
-
 'use client'
-import { useState } from "react"
-import { ToastContainer, toast } from 'react-toastify';
-import { useRouter } from "next/navigation";
 
+import { createTodo } from '@/app/lib/actions';
+import { useFormState } from 'react-dom';
+import { ToastContainer, toast } from "react-toastify";
+import { useRouter } from 'next/navigation'; 
+import { useEffect } from 'react';
 
+const  initialState= {
+    message : '',
+}
 
-export default function CreateTodo() {
+const  CreateTodo = () => {
 
+    // gestion du formulaire avec useFormState 
+    // formAction sert à lier la fonction createTodo au formulaire
+    // state permet de gérer l'état du formulaire (chargement, succès, erreur)
+    const [state , formAction] = useFormState(createTodo , initialState);
+    const router = useRouter();
+    // pour ne pas que le message derreur ou succes double
+    // const [isToastShown, setIsToastShown] = useState(false);
 
-    const [title , setTitle] = useState("")
-    const [date , setDate] = useState("")
-    const [isDesabled , setIsDesabled] = useState(false)
-    // permet de rediriger l'utilisateur
-    const router = useRouter()
+    useEffect(()=>{
 
-    const notifyError = () => toast.error('Veuillez remplir tous les champs !')
-    const notifySucces = () => toast.success('Tâche créée avec succès !' , {
-        onClose: () => {
-            // Redirection vers la page d'accueil après le toast
-           router.push('/todos')
-        }
-    } )
-
-
-
-    const handleCreateTodo = async (e : React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault()
-        // remplir toutes les infos sinon toast error
-        if(!title  || !date ){
-            notifyError()
-            return
-        }
-
-        // retirer le bouton 
-        setIsDesabled(true)
-
-        // envoyer a la bdd via l'api 
-        const response = await fetch('/api/create-todo' , {
-            method : 'POST' ,
-            headers : {
-                'content-Type' : 'application/json'
+        if (state.message === "success") {
+          toast.success("la tache à été crée avec succes", {
+            onClose: () => {
+              router.push("/todos");
             },
-            body : JSON.stringify({
-                title ,
-                date
-            })
-        })
-
-        if(response.ok){
-            // reinitialiser les champs
-            setTitle("")
-            setDate("")
-            setIsDesabled(false)
-            // afficher un toast de succes
-            notifySucces()
-            
+          });
+          // setIsToastShown(true)
+        } else if (state.message === "error") {
+          toast.error("echec de la création de la tâche", {
+            onClose: () => {
+              router.push("/todos");
+            },
+          });
+          //   setIsToastShown(true);
         }
-        else {
-            // afficher un toast d'erreur
-            toast.error('Erreur lors de la création de la tâche !')
-            setIsDesabled(false)
-        }
-        
 
-    }
+    } , [state.message ,router])
+    
 
 
   return (
     <>
-
-        <ToastContainer
+      <ToastContainer
         position="top-center"
-        autoClose={3000}
+        autoClose={500}
         hideProgressBar={false}
         newestOnTop={false}
         closeOnClick={false}
@@ -80,42 +54,49 @@ export default function CreateTodo() {
         pauseOnFocusLoss
         draggable
         pauseOnHover
-        />
+      />
 
-        <form className="form" onSubmit={handleCreateTodo}>
-            <div className="title">
-                <h1>Créer une tâche</h1>
-            </div>
-            <div className="align-horizontal">
-                <div className="todo-container">
-                    <label  className="placeholder" htmlFor="">Tache</label>
-                    <input  
-                    className="input" 
-                    type="text"  
-                    placeholder="indiquez une tache" 
-                    autoComplete="off"  
-                    value={title}
-                    onChange={(e)=> setTitle(e.target.value)}/>
-                </div>
+      <form className="form" action={formAction}>
+        <div className="title">
+          <h1>Créer une tâche</h1>
+        </div>
+        <div className="align-horizontal">
+          <div className="todo-container">
+            <label className="placeholder" htmlFor="">
+              Tache
+            </label>
+            <input
+              className="input"
+              type="text"
+              placeholder="indiquez une tache"
+              autoComplete="off"
+              name="title"
+              required
+            />
+          </div>
 
-                <div className="date-container">
-                <label  className="placeholder" htmlFor="">Date</label>
-                    <input  
-                    className="input" 
-                    type="date"  
-                    placeholder="indiquez une date" 
-                    value={date}
-                    onChange={(e)=> setDate(e.target.value)}/>
-                </div>
-            </div>
+          <div className="date-container">
+            <label className="placeholder" htmlFor="">
+              Date
+            </label>
+            <input
+              className="input"
+              type="date"
+              placeholder="indiquez une date"
+              name="date"
+              required
+            />
+          </div>
+        </div>
 
-            <div className="button-container">
-                {
-                    !isDesabled && 
-                    <button type="submit" className="btn-success">Créer</button>
-                }
-            </div>
-        </form>
+        <div className="button-container">
+          <button type="submit" className="btn-success">
+            Créer
+          </button>
+        </div>
+      </form>
     </>
-  )
+  );
 }
+
+export default CreateTodo;

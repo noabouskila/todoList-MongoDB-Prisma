@@ -1,45 +1,47 @@
 'use client'
 
 import { createTodo } from '@/app/lib/actions';
-import { useFormState } from 'react-dom';
+import { useActionState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import { useRouter } from 'next/navigation'; 
-import { useEffect } from 'react';
+import { useEffect , useRef} from 'react';
+import Button from '@/app/ui/Button';
 
 const  initialState= {
     message : '',
 }
 
 const  CreateTodo = () => {
+  // - gestion du formulaire avec useFormState
+  // - useFormState lie une server action à un formulaire et de suivre son état.
+  // - formAction sert à lier la fonction createTodo au formulaire
+  // - state permet de gérer l'état du formulaire (chargement, succès, erreur)
 
-    // gestion du formulaire avec useFormState 
-    // formAction sert à lier la fonction createTodo au formulaire
-    // state permet de gérer l'état du formulaire (chargement, succès, erreur)
-    const [state , formAction] = useFormState(createTodo , initialState);
-    const router = useRouter();
-    // pour ne pas que le message derreur ou succes double
-    // const [isToastShown, setIsToastShown] = useState(false);
 
-    useEffect(()=>{
+  const [state, formAction] = useActionState(createTodo, initialState);
+  const router = useRouter();
+    //   pr vider les input a la validation du formulaire 
+  const formRef = useRef<HTMLFormElement>(null)
+    //   tester desactivation button
+    //   const [isBtnDisabled, setIsBtnDisabled] = useState(false);
 
-        if (state.message === "success") {
-          toast.success("la tache à été crée avec succes", {
-            onClose: () => {
-              router.push("/todos");
-            },
-          });
-          // setIsToastShown(true)
-        } else if (state.message === "error") {
-          toast.error("echec de la création de la tâche", {
-            onClose: () => {
-              router.push("/todos");
-            },
-          });
-          //   setIsToastShown(true);
-        }
 
-    } , [state.message ,router])
-    
+  useEffect(() => {
+    if (state.message === "success") {
+      toast.success("la tache à été crée avec succes", {
+        onClose: () => {
+          router.push("/todos");
+        },
+      });
+    } else if (state.message === "error") {
+      toast.error("echec de la création de la tâche", {
+        onClose: () => {
+          router.push("/todos");
+        },
+      });
+    }
+  }, [state.message, router]);
+
 
 
   return (
@@ -56,7 +58,15 @@ const  CreateTodo = () => {
         pauseOnHover
       />
 
-      <form className="form" action={formAction}>
+      <form
+        className="form"
+        action={async (formData: FormData) => {
+          formAction(formData); // invoquer actions server
+          formRef.current?.reset(); //vider input
+          //    setIsBtnDisabled(true) // modifier le boutton : pour le desactiver
+        }}
+        ref={formRef}
+      >
         <div className="title">
           <h1>Créer une tâche</h1>
         </div>
@@ -90,9 +100,13 @@ const  CreateTodo = () => {
         </div>
 
         <div className="button-container">
-          <button type="submit" className="btn-success">
+          {/* <button type="submit" className="btn-success">
             Créer
-          </button>
+          </button> */}
+
+          {/* essai desactivation du bouton a la soumission du form */}
+          {/* <Button isDisabled={isBtnDisabled} /> */}
+          <Button/>
         </div>
       </form>
     </>

@@ -266,6 +266,7 @@ section {
 .btn-update {
     background-color: #fff;
     color: #D56729;
+    padding-bottom: 5px;
 }
 
 .btn-delete:hover {

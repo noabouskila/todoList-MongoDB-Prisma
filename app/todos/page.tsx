@@ -1,7 +1,7 @@
 
-import UpdateTodo from "../ui/ButtonIcons";
 import { formatDate } from "../utils/formateDate"
 import { getTodos } from "@/app/lib/data"
+import { UpdateTodo, DeleteTodo } from "@/app/ui/ButtonIcons";
 
 type Todo = {
   id: string;
@@ -30,9 +30,9 @@ const Todos = async  () => {
                   <p className="date">{formatDate(todo.date)}</p>
                   <h2>{todo.title}</h2>
 
-                  <div>
-                    <UpdateTodo  id ={todo.id}/>
-                    <button className="btn btn-delete">Supprimer </button>
+                  <div className="btnIconsContainer">
+                    <UpdateTodo id={todo.id} />
+                    <DeleteTodo id={todo.id} />
                   </div>
                 </div>
               </li>

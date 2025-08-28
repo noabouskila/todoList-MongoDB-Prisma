@@ -105,3 +105,23 @@ export async function updateTodo(
     return { message: "error", error: String(error) };
   }
 }
+
+export async function deleteTodo(id : string){
+  try{
+
+    await prisma.todo.delete({
+      where: {
+        id: id,
+      },
+    });
+
+    revalidatePath("/todos");
+    return { message: "succes" };
+
+  }catch(error){
+    return { message: "error", error: String(error)}
+
+  }
+ 
+
+}

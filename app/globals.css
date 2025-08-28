@@ -308,6 +308,11 @@ section {
    text-align: center; 
 }
 
+.btnIconsContainer{
+    display: flex;
+    justify-content: space-between;
+}
+
 @media screen and (max-width: 1024px) {
     .right-box {
       display: none;
